@@ -7,7 +7,8 @@ const PORT: number | string = process.env.PORT || 3000;
 
 const app: Express = express();
 
-app.use("/api", authRouter);
+app.use(express.json());
+app.use("/api/auth/", authRouter);
 
 (async () => {
     try {
