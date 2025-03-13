@@ -7,8 +7,9 @@ import SuccessMessageI from "../interfaces/successMessageI";
 import User from "../models/User";
 
 const TOKEN_SECRET: string = process.env.TOKEN_SECRET as string;
+const ADMIN_TOKEN_SECRET: string = process.env.ADMIN_TOKEN_SECRET as string;
 
-async function hashPassword(password: string): Promise<string> {
+export async function hashPassword(password: string): Promise<string> {
     const saltRounds: number = 10;
     const salt: string = await bcrypt.genSalt(saltRounds);
     const hashedPassword: string = await bcrypt.hash(password, salt);
@@ -17,6 +18,10 @@ async function hashPassword(password: string): Promise<string> {
 
 function generateToken(userId: number): string {
     return jwt.sign({ userId }, TOKEN_SECRET, { expiresIn: "7d" });
+}
+
+function generateAdminToken(userId: number): string {
+    return jwt.sign({ userId }, ADMIN_TOKEN_SECRET, { expiresIn: "15m" });
 }
 
 class AuthController {
@@ -62,6 +67,15 @@ class AuthController {
             const foundUser: any = await User.findOne({ where: { email } });
             const passwordsMatch: boolean = await bcrypt.compare(password, foundUser?.hashedPassword);
             if (passwordsMatch) {
+                let adminToken: string = "";
+                if (foundUser.role === "admin") {
+                    adminToken = generateAdminToken(foundUser.id);
+                    res.cookie("adminToken", adminToken, {
+                        maxAge: 1000 * 60 * 15,
+                        httpOnly: true,
+                        sameSite: "strict",
+                    });
+                }
                 const token: string = generateToken(foundUser.id);
                 res.cookie("token", token, {
                     maxAge: 1000 * 60 * 60 * 24 * 7,
@@ -71,7 +85,7 @@ class AuthController {
                 const successMessage: SuccessMessageI = {
                     type: "success",
                     message: "User logged in successfully",
-                    data: { token },
+                    data: adminToken ? { token, adminToken } : { token },
                     code: 200,
                 };
                 return res.status(successMessage.code).send(successMessage);

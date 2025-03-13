@@ -3,6 +3,7 @@ import "dotenv/config";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/authRouter";
 import sequelize from "./config/sequelize";
+import createAdmin from "./utils/createAdmin";
 
 const PORT: number | string = process.env.PORT || 3000;
 
@@ -15,6 +16,7 @@ app.use("/api/auth/", authRouter);
 (async () => {
     try {
         await sequelize.sync();
+        await createAdmin();
         console.log("Database connected successfully :)");
         app.listen(PORT, () => {
             console.log(`App is listening on port ${PORT}`);
