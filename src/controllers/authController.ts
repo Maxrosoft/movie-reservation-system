@@ -87,6 +87,28 @@ class AuthController {
             next(error);
         }
     }
+
+    async me(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { userId } = req as any;
+            const foundUser: any = await User.findByPk(userId);
+            const successMessage: SuccessMessageI = {
+                type: "success",
+                message: "Authorized",
+                data: {
+                    UserId: foundUser.id,
+                    firstName: foundUser.firstName,
+                    lastName: foundUser.lastName,
+                    email: foundUser.email,
+                    role: foundUser.role,
+                },
+                code: 200,
+            };
+            return res.status(successMessage.code).send(successMessage);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 export default AuthController;
