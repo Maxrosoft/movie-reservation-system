@@ -21,8 +21,8 @@ function generateToken(userId: number): string {
     return jwt.sign({ userId }, TOKEN_SECRET, { expiresIn: "7d" });
 }
 
-function generateAdminToken(userId: number): string {
-    return jwt.sign({ userId }, ADMIN_TOKEN_SECRET, { expiresIn: "15m" });
+function generateAdminToken(adminId: number): string {
+    return jwt.sign({ adminId }, ADMIN_TOKEN_SECRET, { expiresIn: "15m" });
 }
 
 class AuthController {
@@ -77,9 +77,11 @@ class AuthController {
 
             const foundUser: any = await User.findOne({ where: { email } });
             const passwordsMatch: boolean = await bcrypt.compare(password, foundUser?.hashedPassword);
+            let roleInMessage: string = "User";
             if (passwordsMatch) {
                 let adminToken: string = "";
                 if (foundUser.role === "admin") {
+                    roleInMessage = "Administrator"
                     adminToken = generateAdminToken(foundUser.id);
                     res.cookie("adminToken", adminToken, {
                         maxAge: 1000 * 60 * 15,
@@ -95,8 +97,8 @@ class AuthController {
                 });
                 const successMessage: SuccessMessageI = {
                     type: "success",
-                    message: "User logged in successfully",
-                    data: adminToken ? { token, adminToken } : { token },
+                    message: `${roleInMessage} logged in successfully`,
+                    data: (adminToken ? { token, adminToken } : { token }),
                     code: 200,
                 };
                 return res.status(successMessage.code).send(successMessage);

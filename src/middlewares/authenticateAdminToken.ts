@@ -13,7 +13,7 @@ export default function authenticateAdminToken(req: Request, res: Response, next
     }
     try {
         const decoded: JwtPayload = jwt.verify(token, TOKEN_SECRET) as JwtPayload;
-        (req as any).userId = decoded.userId;
+        (req as any).adminId = decoded.adminId;
         next();
     } catch (error) {
         next(error);

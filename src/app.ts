@@ -2,6 +2,7 @@ import express, { Express } from "express";
 import "dotenv/config";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/authRouter";
+import usersRouter from "./routes/usersRouter";
 import sequelize from "./config/sequelize";
 import createAdmin from "./utils/createAdmin";
 
@@ -12,6 +13,7 @@ const app: Express = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use("/api/auth/", authRouter);
+app.use("/api/users/", usersRouter);
 
 (async () => {
     try {
