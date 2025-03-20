@@ -5,6 +5,7 @@ import "dotenv/config";
 import ErrorMessageI from "../interfaces/errorMessageI";
 import SuccessMessageI from "../interfaces/successMessageI";
 import User from "../models/User";
+import passwordValidationSchema from "../utils/passwordValidationSchema";
 
 const TOKEN_SECRET: string = process.env.TOKEN_SECRET as string;
 const ADMIN_TOKEN_SECRET: string = process.env.ADMIN_TOKEN_SECRET as string;
@@ -32,6 +33,16 @@ class AuthController {
                 const errorMessage: ErrorMessageI = {
                     type: "error",
                     message: "Missed required parameter",
+                    code: 400,
+                };
+                return res.status(errorMessage.code).send(errorMessage);
+            }
+            const passwordValidationDetails: any = passwordValidationSchema.validate(password, { details: true });
+            if (passwordValidationDetails.length > 0) {
+                const errorMessage: ErrorMessageI = {
+                    type: "error",
+                    message: "Passowrd validation failed",
+                    data: passwordValidationDetails,
                     code: 400,
                 };
                 return res.status(errorMessage.code).send(errorMessage);
