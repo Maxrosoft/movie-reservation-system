@@ -3,6 +3,7 @@ import "dotenv/config";
 import cookieParser from "cookie-parser";
 import authRouter from "./routes/authRouter";
 import usersRouter from "./routes/usersRouter";
+import errorHandler from "./middlewares/errorHandler";
 import sequelize from "./config/sequelize";
 import createAdmin from "./utils/createAdmin";
 
@@ -14,6 +15,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/api/auth/", authRouter);
 app.use("/api/users/", usersRouter);
+app.use(errorHandler as any);
 
 (async () => {
     try {
