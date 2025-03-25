@@ -1,11 +1,16 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/sequelize";
+import Movie from "./Movie";
 
 const Showtime = sequelize.define("Showtime", {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
+    },
+    movieId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
     },
     startTime: {
         type: DataTypes.DATE,
@@ -30,6 +35,17 @@ const Showtime = sequelize.define("Showtime", {
             min: 0.1,
         },
     },
+});
+
+Movie.hasMany(Showtime, {
+    foreignKey: "movieId",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+});
+Showtime.belongsTo(Movie, {
+    foreignKey: "movieId",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
 });
 
 export default Showtime;
