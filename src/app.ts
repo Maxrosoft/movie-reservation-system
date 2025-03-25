@@ -8,6 +8,7 @@ import showtimesRouter from "./routes/showtimesRouter";
 import errorHandler from "./middlewares/errorHandler";
 import sequelize from "./config/sequelize";
 import createAdmin from "./utils/createAdmin";
+import "./utils/automaticShowtimesDeletion";
 
 const PORT: number | string = process.env.PORT || 3000;
 
