@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import Movie from "../models/Movie";
 import ErrorMessageI from "../interfaces/errorMessageI";
 import SuccessMessageI from "../interfaces/successMessageI";
+import Showtime from "../models/Showtime";
 
 class MoviesController {
     async addOne(req: Request, res: Response, next: NextFunction) {
@@ -142,6 +143,48 @@ class MoviesController {
                 const successMessage: SuccessMessageI = {
                     type: "success",
                     message: "Movie deleted successfully",
+                    code: 200,
+                };
+                return res.status(successMessage.code).send(successMessage);
+            } else {
+                const errorMessage: ErrorMessageI = {
+                    type: "error",
+                    message: "Movie not found",
+                    code: 404,
+                };
+                return res.status(errorMessage.code).send(errorMessage);
+            }
+        } catch (error) {
+            next(error);
+        }
+    }
+    async getShowtimes(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { movieId } = req.params;
+            const movie: any = await Movie.findByPk(movieId);
+
+            if (movie) {
+                const publicMovie: any = {
+                    title: movie.title,
+                    description: movie.description,
+                    posterUrl: movie.posterUrl,
+                    genres: movie.genres,
+                };
+                const page: number = Number(req.query.page) || 1;
+                const limit: number = Number(req.query.limit) || 10;
+                const offset: number = (page - 1) * limit;
+                const showtimes: any[] = await Showtime.findAll({ where: { movieId }, limit, offset });
+                const publicShowtimes: any[] = [];
+                for (let showtime of showtimes) {
+                    publicShowtimes.push({
+                        startTime: showtime.startTime,
+                        hallType: showtime.hallType,
+                    });
+                }
+                const successMessage: SuccessMessageI = {
+                    type: "success",
+                    message: "Showtimes for specific movie fetched successfully",
+                    data: { page, limit, movie: publicMovie, showtimes: publicShowtimes },
                     code: 200,
                 };
                 return res.status(successMessage.code).send(successMessage);
