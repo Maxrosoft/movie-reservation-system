@@ -8,7 +8,7 @@ class UsersController {
         try {
             const { userId } = req.params;
             const userToPromote: any = await User.findByPk(userId);
-            if (userToPromote) {
+            if (userToPromote && userToPromote.role === "user") {
                 await userToPromote.update({ role: "admin" });
                 const successMessage: SuccessMessageI = {
                     type: "success",
