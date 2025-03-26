@@ -9,6 +9,7 @@ import passwordValidationSchema from "../utils/passwordValidationSchema";
 
 const TOKEN_SECRET: string = process.env.TOKEN_SECRET as string;
 const ADMIN_TOKEN_SECRET: string = process.env.ADMIN_TOKEN_SECRET as string;
+const SUPER_ADMIN_TOKEN_SECRET: string = process.env.SUPER_ADMIN_TOKEN_SECRET as string;
 
 export async function hashPassword(password: string): Promise<string> {
     const saltRounds: number = 10;
@@ -22,7 +23,11 @@ function generateToken(userId: number): string {
 }
 
 function generateAdminToken(adminId: number): string {
-    return jwt.sign({ adminId }, ADMIN_TOKEN_SECRET, { expiresIn: "15m" });
+    return jwt.sign({ adminId }, ADMIN_TOKEN_SECRET, { expiresIn: "1h" });
+}
+
+function generateSuperAdminToken(superAdminId: number): string {
+    return jwt.sign({ superAdminId }, SUPER_ADMIN_TOKEN_SECRET, { expiresIn: "15m" });
 }
 
 class AuthController {
@@ -79,11 +84,24 @@ class AuthController {
             const passwordsMatch: boolean = await bcrypt.compare(password, foundUser?.hashedPassword);
             let roleInMessage: string = "User";
             if (passwordsMatch) {
+                res.clearCookie("token");
+                res.clearCookie("adminToken");
+                res.clearCookie("superAdminToken");
                 let adminToken: string = "";
-                if (foundUser.role === "admin") {
-                    roleInMessage = "Administrator"
+                let superAdminToken: string = "";
+                if (foundUser.role === "admin" || foundUser.role === "superAdmin") {
+                    roleInMessage = "Administrator";
                     adminToken = generateAdminToken(foundUser.id);
                     res.cookie("adminToken", adminToken, {
+                        maxAge: 1000 * 60 * 60,
+                        httpOnly: true,
+                        sameSite: "strict",
+                    });
+                }
+                if (foundUser.role === "superAdmin") {
+                    roleInMessage = "Super Administrator";
+                    superAdminToken = generateSuperAdminToken(foundUser.id);
+                    res.cookie("superAdminToken", superAdminToken, {
                         maxAge: 1000 * 60 * 15,
                         httpOnly: true,
                         sameSite: "strict",
@@ -98,7 +116,11 @@ class AuthController {
                 const successMessage: SuccessMessageI = {
                     type: "success",
                     message: `${roleInMessage} logged in successfully`,
-                    data: (adminToken ? { token, adminToken } : { token }),
+                    data: superAdminToken
+                        ? { token, adminToken, superAdminToken }
+                        : adminToken
+                        ? { token, adminToken }
+                        : { token },
                     code: 200,
                 };
                 return res.status(successMessage.code).send(successMessage);

@@ -7,7 +7,7 @@ import moviesRouter from "./routes/moviesRouter";
 import showtimesRouter from "./routes/showtimesRouter";
 import errorHandler from "./middlewares/errorHandler";
 import sequelize from "./config/sequelize";
-import createAdmin from "./utils/createAdmin";
+import createSuperAdmin from "./utils/createSuperAdmin";
 import "./utils/automaticShowtimesDeletion";
 
 const PORT: number | string = process.env.PORT || 3000;
@@ -25,7 +25,7 @@ app.use(errorHandler as any);
 (async () => {
     try {
         await sequelize.sync();
-        await createAdmin();
+        await createSuperAdmin();
         console.log("Database connected successfully :)");
         app.listen(PORT, () => {
             console.log(`App is listening on port ${PORT}`);
