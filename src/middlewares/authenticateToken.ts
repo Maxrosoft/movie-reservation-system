@@ -13,7 +13,7 @@ export default function authenticateToken(req: Request, res: Response, next: Nex
     }
     try {
         const decoded: JwtPayload = jwt.verify(token, TOKEN_SECRET) as JwtPayload;
-        (req as any).adminId = decoded.adminId;
+        (req as any).userId = decoded.userId;
         next();
     } catch (error) {
         next(error);
