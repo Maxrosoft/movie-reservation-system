@@ -28,6 +28,30 @@ class UsersController {
             next(error);
         }
     }
+    async demote(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { userId } = req.params;
+            const userToDemote: any = await User.findByPk(userId);
+            if (userToDemote && userToDemote.role === "admin") {
+                await userToDemote.update({ role: "user" });
+                const successMessage: SuccessMessageI = {
+                    type: "success",
+                    message: "Admin demoted successfully",
+                    code: 200,
+                };
+                return res.status(successMessage.code).send(successMessage);
+            } else {
+                const errorMessage: ErrorMessageI = {
+                    type: "error",
+                    message: "Admin not found",
+                    code: 404,
+                };
+                return res.status(errorMessage.code).send(errorMessage);
+            }
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 export default UsersController;
