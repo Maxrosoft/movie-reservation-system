@@ -5,6 +5,7 @@ import authRouter from "./routes/authRouter";
 import usersRouter from "./routes/usersRouter";
 import moviesRouter from "./routes/moviesRouter";
 import showtimesRouter from "./routes/showtimesRouter";
+import hallsRouter from "./routes/hallsRouter";
 import errorHandler from "./middlewares/errorHandler";
 import sequelize from "./config/sequelize";
 import createSuperAdmin from "./utils/createSuperAdmin";
@@ -20,6 +21,7 @@ app.use("/api/auth/", authRouter);
 app.use("/api/users/", usersRouter);
 app.use("/api/movies/", moviesRouter);
 app.use("/api/showtimes/", showtimesRouter);
+app.use("/api/halls/", hallsRouter)
 app.use(errorHandler as any);
 
 (async () => {
