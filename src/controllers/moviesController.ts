@@ -16,10 +16,11 @@ class MoviesController {
                 };
                 return res.status(errorMessage.code).send(errorMessage);
             }
-            await Movie.create({ title, description, posterUrl, genres });
+            const movie: any = await Movie.create({ title, description, posterUrl, genres });
             const successMessage: SuccessMessageI = {
                 type: "success",
                 message: "Movie added successfully",
+                data: {movieId: movie.id},
                 code: 201,
             };
             return res.status(successMessage.code).send(successMessage);
