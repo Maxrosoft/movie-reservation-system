@@ -5,30 +5,37 @@
     "main": "./src/app.ts",
     "scripts": {
         "dev": "nodemon ./src/app.ts",
-        "start": "tsx ./src/app.ts"
+        "start": "tsx ./src/app.ts",
+        "test": "tsx ./node_modules/.bin/mocha ./tests/**/*.ts --exit"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "dependencies": {
         "bcrypt": "^5.1.1",
+        "chai": "^5.2.0",
         "cookie-parser": "^1.4.7",
         "dotenv": "^16.4.7",
         "express": "^4.21.2",
         "jsonwebtoken": "^9.0.2",
+        "mocha": "^11.1.0",
         "node-cron": "^3.0.3",
         "password-validator": "^5.3.0",
         "pg": "^8.13.3",
-        "sequelize": "^6.37.6"
+        "sequelize": "^6.37.6",
+        "supertest": "^7.1.0"
     },
     "devDependencies": {
         "@types/bcrypt": "^5.0.2",
+        "@types/chai": "^5.2.1",
         "@types/cookie-parser": "^1.4.8",
         "@types/express": "^5.0.0",
         "@types/jsonwebtoken": "^9.0.9",
+        "@types/mocha": "^10.0.10",
         "@types/node-cron": "^3.0.11",
         "@types/pg": "^8.11.11",
         "@types/sequelize": "^4.28.20",
+        "@types/supertest": "^6.0.3",
         "nodemon": "^3.1.9",
         "tsx": "^4.19.3",
         "typescript": "^5.8.2"

@@ -36,3 +36,5 @@ app.use(errorHandler as any);
         console.log("Database connection failed :(");
     }
 })();
+
+export default app;
