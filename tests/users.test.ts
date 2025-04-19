@@ -13,7 +13,7 @@ describe("Users API", () => {
     let testUser: any;
     before(async () => {
         await createSuperAdmin();
-
+        await User.destroy({ where: { email: "john.doe@example.com" } });
         testUser = await User.create({
             firstName: "John",
             lastName: "Doe",
@@ -21,6 +21,10 @@ describe("Users API", () => {
             hashedPassword: await hashPassword("Password123"),
             role: "user",
         });
+    });
+
+    after(async () => {
+        await User.destroy({ where: { email: "john.doe@example.com" } });
     });
 
     describe("PUT /api/users/:userId/promote", () => {
@@ -45,7 +49,7 @@ describe("Users API", () => {
                 email: SUPER_ADMIN_EMAIL,
                 password: SUPER_ADMIN_PASSWORD,
             });
-            
+
             const superAdminToken = loginRes.body.data.superAdminToken;
 
             const res = await request(app)
@@ -54,9 +58,5 @@ describe("Users API", () => {
             expect(res.status).to.equal(200);
             expect(res.body.message).to.equal("Admin demoted successfully");
         });
-    });
-
-    after(async () => {
-        await User.destroy({ where: { email: "john.doe@example.com" } });
     });
 });
