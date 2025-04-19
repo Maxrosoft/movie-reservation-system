@@ -7,7 +7,7 @@ import Movie from "../models/Movie";
 class ShowtimesController {
     async addOne(req: Request, res: Response, next: NextFunction) {
         try {
-            const { movieId, startTime, hallType, priceMultiplier } = req.body;
+            const { movieId, startTime, hallType, price } = req.body;
             if (!(movieId && startTime && hallType)) {
                 const errorMessage: ErrorMessageI = {
                     type: "error",
@@ -16,7 +16,7 @@ class ShowtimesController {
                 };
                 return res.status(errorMessage.code).send(errorMessage);
             }
-            await Showtime.create({ movieId, startTime, hallType, priceMultiplier });
+            await Showtime.create({ movieId, startTime, hallType, price });
             const successMessage: SuccessMessageI = {
                 type: "success",
                 message: "Showtime added successfully",
@@ -46,6 +46,7 @@ class ShowtimesController {
                     movie: publicMovie,
                     startTime: showtime.startTime,
                     hallType: showtime.hallType,
+                    price: showtime.price,
                 });
             }
             const successMessage: SuccessMessageI = {
@@ -75,6 +76,7 @@ class ShowtimesController {
                     movie: publicMovie,
                     startTime: showtime.startTime,
                     hallType: showtime.hallType,
+                    price: showtime.price,
                 };
                 const successMessage: SuccessMessageI = {
                     type: "success",
@@ -100,7 +102,7 @@ class ShowtimesController {
             const { showtimeId } = req.params;
             const showtime: any = await Showtime.findByPk(showtimeId);
             if (showtime) {
-                const { movieId, startTime, hallType, priceMultiplier } = req.body;
+                const { movieId, startTime, hallType, price } = req.body;
                 if (!(movieId && startTime && hallType)) {
                     const errorMessage: ErrorMessageI = {
                         type: "error",
@@ -109,7 +111,7 @@ class ShowtimesController {
                     };
                     return res.status(errorMessage.code).send(errorMessage);
                 }
-                await showtime.update({ movieId, startTime, hallType, priceMultiplier });
+                await showtime.update({ movieId, startTime, hallType, price });
                 const successMessage: SuccessMessageI = {
                     type: "success",
                     message: "Showtime changed successfully",
@@ -133,7 +135,7 @@ class ShowtimesController {
             const { showtimeId } = req.params;
             const showtime: any = await Showtime.findByPk(showtimeId);
             if (showtime) {
-                const { movieId, startTime, hallType, priceMultiplier } = req.body;
+                const { movieId, startTime, hallType, price } = req.body;
                 if (!(movieId || startTime || hallType)) {
                     const errorMessage: ErrorMessageI = {
                         type: "error",
@@ -142,7 +144,7 @@ class ShowtimesController {
                     };
                     return res.status(errorMessage.code).send(errorMessage);
                 }
-                await showtime.update({ movieId, startTime, hallType, priceMultiplier });
+                await showtime.update({ movieId, startTime, hallType, price });
                 const successMessage: SuccessMessageI = {
                     type: "success",
                     message: "Showtime details changed successfully",
@@ -188,3 +190,4 @@ class ShowtimesController {
 }
 
 export default ShowtimesController;
+

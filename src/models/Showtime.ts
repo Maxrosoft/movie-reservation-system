@@ -27,12 +27,12 @@ const Showtime = sequelize.define("Showtime", {
         type: DataTypes.ENUM("massive", "medium", "small", "luxury"),
         allowNull: false,
     },
-    priceMultiplier: {
+    price: {
         type: DataTypes.FLOAT,
         allowNull: false,
-        defaultValue: 1.0,
+        defaultValue: 0.0,
         validate: {
-            min: 0.1,
+            min: 0.0,
         },
     },
 });
@@ -49,3 +49,4 @@ Showtime.belongsTo(Movie, {
 });
 
 export default Showtime;
+
