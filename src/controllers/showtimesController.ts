@@ -3,12 +3,13 @@ import Showtime from "../models/Showtime";
 import ErrorMessageI from "../interfaces/errorMessageI";
 import SuccessMessageI from "../interfaces/successMessageI";
 import Movie from "../models/Movie";
+import Hall from "../models/Hall";
 
 class ShowtimesController {
     async addOne(req: Request, res: Response, next: NextFunction) {
         try {
-            const { movieId, startTime, hallType, price } = req.body;
-            if (!(movieId && startTime && hallType)) {
+            const { movieId, hallId, startTime, price } = req.body;
+            if (!(movieId && hallId && startTime && price !== undefined)) {
                 const errorMessage: ErrorMessageI = {
                     type: "error",
                     message: "Missed required parameter",
@@ -16,10 +17,11 @@ class ShowtimesController {
                 };
                 return res.status(errorMessage.code).send(errorMessage);
             }
-            await Showtime.create({ movieId, startTime, hallType, price });
+            const showtime: any = await Showtime.create({ movieId, hallId, startTime, price });
             const successMessage: SuccessMessageI = {
                 type: "success",
                 message: "Showtime added successfully",
+                data: { showtimeId: showtime.id },
                 code: 201,
             };
             return res.status(successMessage.code).send(successMessage);
@@ -36,16 +38,21 @@ class ShowtimesController {
             const publicShowtimes: any[] = [];
             for (let showtime of showtimes) {
                 const movie: any = await Movie.findByPk(showtime.movieId);
+                const hall: any = await Hall.findByPk(showtime.hallId);
                 const publicMovie: any = {
                     title: movie.title,
                     description: movie.description,
                     posterUrl: movie.posterUrl,
                     genres: movie.genres,
                 };
+                const publicHall: any = {
+                    name: hall.name,
+                    seats: hall.seats,
+                };
                 publicShowtimes.push({
                     movie: publicMovie,
+                    hall: publicHall,
                     startTime: showtime.startTime,
-                    hallType: showtime.hallType,
                     price: showtime.price,
                 });
             }
@@ -66,16 +73,21 @@ class ShowtimesController {
             const showtime: any = await Showtime.findByPk(showtimeId);
             if (showtime) {
                 const movie: any = await Movie.findByPk(showtime.movieId);
+                const hall: any = await Hall.findByPk(showtime.hallId);
                 const publicMovie: any = {
                     title: movie.title,
                     description: movie.description,
                     posterUrl: movie.posterUrl,
                     genres: movie.genres,
                 };
+                const publicHall: any = {
+                    name: hall.name,
+                    seats: hall.seats,
+                };
                 const publicShowtime: any = {
                     movie: publicMovie,
+                    hall: publicHall,
                     startTime: showtime.startTime,
-                    hallType: showtime.hallType,
                     price: showtime.price,
                 };
                 const successMessage: SuccessMessageI = {
@@ -102,8 +114,8 @@ class ShowtimesController {
             const { showtimeId } = req.params;
             const showtime: any = await Showtime.findByPk(showtimeId);
             if (showtime) {
-                const { movieId, startTime, hallType, price } = req.body;
-                if (!(movieId && startTime && hallType)) {
+                const { movieId, hallId, startTime, price } = req.body;
+                if (!(movieId && hallId && startTime)) {
                     const errorMessage: ErrorMessageI = {
                         type: "error",
                         message: "Missed required parameter",
@@ -111,7 +123,7 @@ class ShowtimesController {
                     };
                     return res.status(errorMessage.code).send(errorMessage);
                 }
-                await showtime.update({ movieId, startTime, hallType, price });
+                await showtime.update({ movieId, hallId, startTime, price });
                 const successMessage: SuccessMessageI = {
                     type: "success",
                     message: "Showtime changed successfully",
@@ -135,8 +147,8 @@ class ShowtimesController {
             const { showtimeId } = req.params;
             const showtime: any = await Showtime.findByPk(showtimeId);
             if (showtime) {
-                const { movieId, startTime, hallType, price } = req.body;
-                if (!(movieId || startTime || hallType)) {
+                const { movieId, hallId, startTime, price } = req.body;
+                if (!(movieId || hallId || startTime)) {
                     const errorMessage: ErrorMessageI = {
                         type: "error",
                         message: "Missed required parameter",
@@ -144,7 +156,7 @@ class ShowtimesController {
                     };
                     return res.status(errorMessage.code).send(errorMessage);
                 }
-                await showtime.update({ movieId, startTime, hallType, price });
+                await showtime.update({ movieId, hallId, startTime, price });
                 const successMessage: SuccessMessageI = {
                     type: "success",
                     message: "Showtime details changed successfully",
@@ -190,4 +202,3 @@ class ShowtimesController {
 }
 
 export default ShowtimesController;
-

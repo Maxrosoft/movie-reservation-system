@@ -1,6 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/sequelize";
 import Movie from "./Movie";
+import Hall from "./Hall";
 
 const Showtime = sequelize.define("Showtime", {
     id: {
@@ -23,8 +24,8 @@ const Showtime = sequelize.define("Showtime", {
             },
         },
     },
-    hallType: {
-        type: DataTypes.ENUM("massive", "medium", "small", "luxury"),
+    hallId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
     },
     price: {
@@ -35,6 +36,11 @@ const Showtime = sequelize.define("Showtime", {
             min: 0.0,
         },
     },
+    occupiedSeats: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: false,
+        defaultValue: [],
+    }
 });
 
 Movie.hasMany(Showtime, {
@@ -44,6 +50,17 @@ Movie.hasMany(Showtime, {
 });
 Showtime.belongsTo(Movie, {
     foreignKey: "movieId",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+});
+
+Hall.hasMany(Showtime, {
+    foreignKey: "hallId",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+});
+Showtime.belongsTo(Hall, {
+    foreignKey: "hallId",
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
 });
