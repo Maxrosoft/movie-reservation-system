@@ -14,40 +14,38 @@ Authentication is handled via JWT. Endpoints are protected using:
 ## 📌 API Endpoints
 
 ### Auth (`/api/auth`)
-- [x] `POST /register` – Register a new user
-- [x] `POST /login` – Log in and receive token
-- [x] `GET /me` – Get current logged-in user
+- `POST /register` – Register a new user
+- `POST /login` – Log in and receive token
+- `GET /me` – Get current logged-in user
 
 ### Halls (`/api/halls`)
-- [x] `POST /` – Add new hall _(admin)_
-- [x] `GET /` – Get all halls
-- [x] `GET /:hallId` – Get hall by ID
-- [x] `PUT /:hallId` – Replace hall _(admin)_
-- [x] `PATCH /:hallId` – Update hall partially _(admin)_
-- [x] `DELETE /:hallId` – Delete hall _(admin)_
+- `POST /` – Add new hall _(admin)_
+- `GET /` – Get all halls
+- `GET /:hallId` – Get hall by ID
+- `PUT /:hallId` – Replace hall _(admin)_
+- `PATCH /:hallId` – Update hall partially _(admin)_
+- `DELETE /:hallId` – Delete hall _(admin)_
 
 ### Movies (`/api/movies`)
-- [x] `POST /` – Add new movie _(admin)_
-- [x] `GET /` – Get all movies _(admin)_
-- [x] `GET /:movieId` – Get movie by ID _(admin)_
-- [x] `PUT /:movieId` – Replace movie _(admin)_
-- [x] `PATCH /:movieId` – Update movie partially _(admin)_
-- [x] `DELETE /:movieId` – Delete movie _(admin)_
-- [x] `GET /:movieId/showtimes` – Get all showtimes for movie
+- `POST /` – Add new movie _(admin)_
+- `GET /` – Get all movies _(admin)_
+- `GET /:movieId` – Get movie by ID _(admin)_
+- `PUT /:movieId` – Replace movie _(admin)_
+- `PATCH /:movieId` – Update movie partially _(admin)_
+- `DELETE /:movieId` – Delete movie _(admin)_
+- `GET /:movieId/showtimes` – Get all showtimes for movie
 
 ### Showtimes (`/api/showtimes`)
-- [x] `POST /` – Add showtime _(admin)_
-- [x] `GET /` – Get all showtimes
-- [x] `GET /:showtimeId` – Get showtime by ID
-- [x] `PUT /:showtimeId` – Replace showtime _(admin)_
-- [x] `PATCH /:showtimeId` – Update showtime _(admin)_
-- [x] `DELETE /:showtimeId` – Delete showtime _(admin)_
+- `POST /` – Add showtime _(admin)_
+- `GET /` – Get all showtimes
+- `GET /:showtimeId` – Get showtime by ID
+- `PUT /:showtimeId` – Replace showtime _(admin)_
+- `PATCH /:showtimeId` – Update showtime _(admin)_
+- `DELETE /:showtimeId` – Delete showtime _(admin)_
 
 ### Users (`/api/users`)
-- [x] `PUT /:userId/promote` – Promote user to admin _(admin)_
-- [x] `PUT /:userId/demote` – Demote user from admin _(super admin)_
-
----
+- `PUT /:userId/promote` – Promote user to admin _(admin)_
+- `PUT /:userId/demote` – Demote user from admin _(super admin)_
 
 ## 🛠 Setup Instructions
 
@@ -66,9 +64,3 @@ cp .env.example .env
 # Start the server
 npm run dev
 ```
-
----
-
-## 📄 License
-
-MIT
