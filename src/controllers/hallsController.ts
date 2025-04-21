@@ -30,11 +30,14 @@ class HallsController {
 
     async fetchAll(req: Request, res: Response, next: NextFunction) {
         try {
-            const halls = await Hall.findAll();
+            const page: number = Number(req.query.page) || 1;
+            const limit: number = Number(req.query.limit) || 10;
+            const offset: number = (page - 1) * limit;
+            const halls: any[] = await Hall.findAll({ limit, offset });
             const successMessage: SuccessMessageI = {
                 type: "success",
                 message: "Halls fetched successfully",
-                data: { halls },
+                data: { page, limit, halls },
                 code: 200,
             };
             return res.status(successMessage.code).send(successMessage);
