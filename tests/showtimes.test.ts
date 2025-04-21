@@ -9,7 +9,7 @@ import "dotenv/config";
 const SUPER_ADMIN_EMAIL: string = process.env.SUPER_ADMIN_EMAIL as string;
 const SUPER_ADMIN_PASSWORD: string = process.env.SUPER_ADMIN_PASSWORD as string;
 
-describe("ShowtimesController", () => {
+describe("Showtimes API", () => {
     const testMovie: any = {
         title: "Test Movie",
         description: "A test movie",
