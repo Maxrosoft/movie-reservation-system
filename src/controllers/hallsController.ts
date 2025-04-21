@@ -16,10 +16,11 @@ class HallsController {
                 return res.status(errorMessage.code).send(errorMessage);
             }
 
-            await Hall.create({ name, seats, priceMultiplier });
+            const hall: any = await Hall.create({ name, seats, priceMultiplier });
             const successMessage: SuccessMessageI = {
                 type: "success",
                 message: "Hall added successfully",
+                data: {hallId: hall.id},
                 code: 201,
             };
             return res.status(successMessage.code).send(successMessage);
