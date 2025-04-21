@@ -115,7 +115,7 @@ class ShowtimesController {
             const showtime: any = await Showtime.findByPk(showtimeId);
             if (showtime) {
                 const { movieId, hallId, startTime, price } = req.body;
-                if (!(movieId && hallId && startTime)) {
+                if (!(movieId && hallId && startTime && price !== undefined)) {
                     const errorMessage: ErrorMessageI = {
                         type: "error",
                         message: "Missed required parameter",
@@ -148,7 +148,7 @@ class ShowtimesController {
             const showtime: any = await Showtime.findByPk(showtimeId);
             if (showtime) {
                 const { movieId, hallId, startTime, price } = req.body;
-                if (!(movieId || hallId || startTime)) {
+                if (!(movieId || hallId || startTime || price !== undefined)) {
                     const errorMessage: ErrorMessageI = {
                         type: "error",
                         message: "Missed required parameter",
