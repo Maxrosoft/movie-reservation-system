@@ -47,8 +47,20 @@ describe("Auth API", () => {
             expect(res.body.data).to.have.property("email", "john.doe@example.com");
         });
     });
+
+    describe("POST /api/auth/logout", () => {
+        it("should logout the current user", async () => {
+            const loginRes = await request(app).post("/api/auth/login").send({
+                email: "john.doe@example.com",
+                password: "Password123",
+            });
+            const token = loginRes.body.data.token;
+
+            const res = await request(app)
+                .post("/api/auth/logout")
+                .set("Cookie", [`token=${token}`]);
+            expect(res.status).to.equal(200);
+            expect(res.body.message).to.equal("Logged out successfully");
+        });
+    });
 });
-
-
-
-
