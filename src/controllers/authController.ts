@@ -224,6 +224,55 @@ class AuthController {
             next(error);
         }
     }
+
+    async changePassword(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { userId } = req as any;
+            const { oldPassword, newPassword } = req.body;
+            if (!(oldPassword && newPassword)) {
+                const errorMessage: ErrorMessageI = {
+                    type: "error",
+                    message: "Missed required parameter",
+                    code: 400,
+                };
+                return res.status(errorMessage.code).send(errorMessage);
+            }
+
+            const foundUser: any = await User.findByPk(userId);
+            const passwordsMatch: boolean = await bcrypt.compare(oldPassword, foundUser?.hashedPassword);
+            if (passwordsMatch) {
+                const passwordValidationDetails: any = passwordValidationSchema.validate(newPassword, {
+                    details: true,
+                });
+                if (passwordValidationDetails.length > 0) {
+                    const errorMessage: ErrorMessageI = {
+                        type: "error",
+                        message: "Passowrd validation failed",
+                        data: passwordValidationDetails,
+                        code: 400,
+                    };
+                    return res.status(errorMessage.code).send(errorMessage);
+                }
+                const hashedPassword: string = await bcrypt.hash(newPassword, 10);
+                await foundUser.update({ hashedPassword });
+                const successMessage: SuccessMessageI = {
+                    type: "success",
+                    message: "Password changed successfully",
+                    code: 200,
+                };
+                return res.status(successMessage.code).send(successMessage);
+            } else {
+                const errorMessage: ErrorMessageI = {
+                    type: "error",
+                    message: "Wrong password",
+                    code: 401,
+                };
+                return res.status(errorMessage.code).send(errorMessage);
+            }
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 export default AuthController;
