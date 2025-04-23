@@ -158,6 +158,22 @@ class AuthController {
             next(error);
         }
     }
+
+    async logout(req: Request, res: Response, next: NextFunction) {
+        try {
+            res.clearCookie("token");
+            res.clearCookie("adminToken");
+            res.clearCookie("superAdminToken");
+            const successMessage: SuccessMessageI = {
+                type: "success",
+                message: "Logged out successfully",
+                code: 200,
+            };
+            return res.status(successMessage.code).send(successMessage);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 export default AuthController;
