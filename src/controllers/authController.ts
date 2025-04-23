@@ -174,6 +174,56 @@ class AuthController {
             next(error);
         }
     }
+
+    async refresh(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { userId } = req as any;
+            const foundUser: any = await User.findByPk(userId);
+            res.clearCookie("token");
+            res.clearCookie("adminToken");
+            res.clearCookie("superAdminToken");
+            let roleInMessage: string = "User";
+            let adminToken: string = "";
+            let superAdminToken: string = "";
+            if (foundUser.role === "admin" || foundUser.role === "superAdmin") {
+                roleInMessage = "Administrator";
+                adminToken = generateAdminToken(foundUser.id);
+                res.cookie("adminToken", adminToken, {
+                    maxAge: 1000 * 60 * 60,
+                    httpOnly: true,
+                    sameSite: "strict",
+                });
+            }
+            if (foundUser.role === "superAdmin") {
+                roleInMessage = "Super Administrator";
+                superAdminToken = generateSuperAdminToken(foundUser.id);
+                res.cookie("superAdminToken", superAdminToken, {
+                    maxAge: 1000 * 60 * 15,
+                    httpOnly: true,
+                    sameSite: "strict",
+                });
+            }
+            const token: string = generateToken(foundUser.id);
+            res.cookie("token", token, {
+                maxAge: 1000 * 60 * 60 * 24 * 7,
+                httpOnly: true,
+                sameSite: "strict",
+            });
+            const successMessage: SuccessMessageI = {
+                type: "success",
+                message: `Refreshed successfully for ${roleInMessage}`,
+                data: superAdminToken
+                    ? { token, adminToken, superAdminToken }
+                    : adminToken
+                    ? { token, adminToken }
+                    : { token },
+                code: 200,
+            };
+            return res.status(successMessage.code).send(successMessage);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 export default AuthController;
