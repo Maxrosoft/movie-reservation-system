@@ -63,4 +63,20 @@ describe("Auth API", () => {
             expect(res.body.message).to.equal("Logged out successfully");
         });
     });
+
+    describe("POST /api/auth/refresh-token", () => {
+        it("should refresh the logged-in user's tokens", async () => {
+            const loginRes = await request(app).post("/api/auth/login").send({
+                email: "john.doe@example.com",
+                password: "Password123",
+            });
+            const token = loginRes.body.data.token;
+
+            const res = await request(app)
+                .post("/api/auth/refresh-token")
+                .set("Cookie", [`token=${token}`]);
+            expect(res.status).to.equal(200);
+            expect(res.body.message).to.include("Refreshed successfully");
+        });
+    });
 });
