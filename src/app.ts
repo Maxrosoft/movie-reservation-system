@@ -21,7 +21,7 @@ app.use("/api/auth/", authRouter);
 app.use("/api/users/", usersRouter);
 app.use("/api/movies/", moviesRouter);
 app.use("/api/showtimes/", showtimesRouter);
-app.use("/api/halls/", hallsRouter)
+app.use("/api/halls/", hallsRouter);
 app.use(errorHandler as any);
 
 (async () => {

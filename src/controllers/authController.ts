@@ -6,6 +6,8 @@ import ErrorMessageI from "../interfaces/errorMessageI";
 import SuccessMessageI from "../interfaces/successMessageI";
 import User from "../models/User";
 import passwordValidationSchema from "../utils/passwordValidationSchema";
+import sendMailToResetPassword from "../utils/sendMailToResetPassword";
+import redisClient from "../config/redis";
 
 const TOKEN_SECRET: string = process.env.TOKEN_SECRET as string;
 const ADMIN_TOKEN_SECRET: string = process.env.ADMIN_TOKEN_SECRET as string;
@@ -84,9 +86,9 @@ class AuthController {
             const passwordsMatch: boolean = await bcrypt.compare(password, foundUser?.hashedPassword);
             let roleInMessage: string = "User";
             if (passwordsMatch) {
-                res.clearCookie("token");
-                res.clearCookie("adminToken");
-                res.clearCookie("superAdminToken");
+                if (req.cookies.token) res.clearCookie("token");
+                if (req.cookies.adminToken) res.clearCookie("adminToken");
+                if (req.cookies.superAdminToken) res.clearCookie("superAdminToken");
                 let adminToken: string = "";
                 let superAdminToken: string = "";
                 if (foundUser.role === "admin" || foundUser.role === "superAdmin") {
@@ -161,9 +163,9 @@ class AuthController {
 
     async logout(req: Request, res: Response, next: NextFunction) {
         try {
-            res.clearCookie("token");
-            res.clearCookie("adminToken");
-            res.clearCookie("superAdminToken");
+            if (req.cookies.token) res.clearCookie("token");
+            if (req.cookies.adminToken) res.clearCookie("adminToken");
+            if (req.cookies.superAdminToken) res.clearCookie("superAdminToken");
             const successMessage: SuccessMessageI = {
                 type: "success",
                 message: "Logged out successfully",
@@ -179,9 +181,9 @@ class AuthController {
         try {
             const { userId } = req as any;
             const foundUser: any = await User.findByPk(userId);
-            res.clearCookie("token");
-            res.clearCookie("adminToken");
-            res.clearCookie("superAdminToken");
+            if (req.cookies.token) res.clearCookie("token");
+            if (req.cookies.adminToken) res.clearCookie("adminToken");
+            if (req.cookies.superAdminToken) res.clearCookie("superAdminToken");
             let roleInMessage: string = "User";
             let adminToken: string = "";
             let superAdminToken: string = "";
@@ -253,7 +255,7 @@ class AuthController {
                     };
                     return res.status(errorMessage.code).send(errorMessage);
                 }
-                const hashedPassword: string = await bcrypt.hash(newPassword, 10);
+                const hashedPassword: string = await hashPassword(newPassword);
                 await foundUser.update({ hashedPassword });
                 const successMessage: SuccessMessageI = {
                     type: "success",
@@ -265,6 +267,71 @@ class AuthController {
                 const errorMessage: ErrorMessageI = {
                     type: "error",
                     message: "Wrong password",
+                    code: 401,
+                };
+                return res.status(errorMessage.code).send(errorMessage);
+            }
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async forgotPassword(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { userId } = req as any;
+            const foundUser: any = await User.findByPk(userId);
+            const email: string = foundUser.email;
+            await sendMailToResetPassword(email);
+            const successMessage: SuccessMessageI = {
+                type: "success",
+                message: "Email sent successfully",
+                code: 200,
+            };
+            return res.status(successMessage.code).send(successMessage);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async resetPassword(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { userId } = req as any;
+            const { sixDigitCode, newPassword } = req.body;
+            if (!(sixDigitCode && newPassword)) {
+                const errorMessage: ErrorMessageI = {
+                    type: "error",
+                    message: "Missed required parameter",
+                    code: 400,
+                };
+                return res.status(errorMessage.code).send(errorMessage);
+            }
+            const foundUser: any = await User.findByPk(userId);
+            const cachedCode: any = await redisClient.get(foundUser.email);
+            if (cachedCode === sixDigitCode) {
+                const passwordValidationDetails: any = passwordValidationSchema.validate(newPassword, {
+                    details: true,
+                });
+                if (passwordValidationDetails.length > 0) {
+                    const errorMessage: ErrorMessageI = {
+                        type: "error",
+                        message: "Passowrd validation failed",
+                        data: passwordValidationDetails,
+                        code: 400,
+                    };
+                    return res.status(errorMessage.code).send(errorMessage);
+                }
+                const hashedPassword: string = await hashPassword(newPassword);
+                await foundUser.update({ hashedPassword });
+                const successMessage: SuccessMessageI = {
+                    type: "success",
+                    message: "Password changed successfully",
+                    code: 200,
+                };
+                return res.status(successMessage.code).send(successMessage);
+            } else {
+                const errorMessage: ErrorMessageI = {
+                    type: "error",
+                    message: "Wrong code",
                     code: 401,
                 };
                 return res.status(errorMessage.code).send(errorMessage);
