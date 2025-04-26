@@ -17,6 +17,11 @@ Authentication is handled via JWT. Endpoints are protected using:
 - `POST /register` – Register a new user
 - `POST /login` – Log in and receive token
 - `GET /me` – Get current logged-in user
+- `POST /logout` – Log out and delete token
+- `POST /refresh-token` – Get new token if current one is close to expiring
+- `POST /change-password` – Update user password
+- `POST /forgot-password` – Send password reset email
+- `POST /reset-password` – Reset password via provided token
 
 ### Halls (`/api/halls`)
 - `POST /` – Add new hall _(admin)_
@@ -39,6 +44,7 @@ Authentication is handled via JWT. Endpoints are protected using:
 - `POST /` – Add showtime _(admin)_
 - `GET /` – Get all showtimes
 - `GET /:showtimeId` – Get showtime by ID
+- `GET /:showtimeId/seats` – Get available seats for showtime
 - `PUT /:showtimeId` – Replace showtime _(admin)_
 - `PATCH /:showtimeId` – Update showtime _(admin)_
 - `DELETE /:showtimeId` – Delete showtime _(admin)_
