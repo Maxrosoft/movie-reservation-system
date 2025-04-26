@@ -263,6 +263,42 @@ describe("Showtimes API", () => {
         });
     });
 
+    describe("GET /api/showtimes/:showtimeId/seats", () => {
+        it("should fetch available seats", async () => {
+            const loginRes = await request(app).post("/api/auth/login").send({
+                email: SUPER_ADMIN_EMAIL,
+                password: SUPER_ADMIN_PASSWORD,
+            });
+            const token = loginRes.body.data.token;
+
+            const res = await request(app)
+                .get(`/api/showtimes/${testShowtimeId}/seats`)
+                .set("Cookie", [`token=${token}`]);
+
+            expect(res.status).to.equal(200);
+            expect(res.body.type).to.equal("success");
+            expect(res.body.message).to.equal("Seats fetched successfully");
+            expect(res.body.data).to.have.property("showtimeId");
+            expect(res.body.data).to.have.property("availableSeats");
+        });
+
+        it("should return error for not found showtime", async () => {
+            const loginRes = await request(app).post("/api/auth/login").send({
+                email: SUPER_ADMIN_EMAIL,
+                password: SUPER_ADMIN_PASSWORD,
+            });
+            const token = loginRes.body.data.token;
+
+            const res = await request(app)
+                .get("/api/showtimes/0/seats")
+                .set("Cookie", [`token=${token}`]);
+
+            expect(res.status).to.equal(404);
+            expect(res.body.type).to.equal("error");
+            expect(res.body.message).to.equal("Showtime not found");
+        });
+    });
+
     describe("DELETE /api/showtimes/:showtimeId", () => {
         it("should delete a showtime", async () => {
             const loginRes = await request(app).post("/api/auth/login").send({
