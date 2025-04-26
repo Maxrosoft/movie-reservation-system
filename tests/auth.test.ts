@@ -79,4 +79,42 @@ describe("Auth API", () => {
             expect(res.body.message).to.include("Refreshed successfully");
         });
     });
+
+    describe("POST /api/auth/change-password", () => {
+        it("should change the password for the logged-in user", async () => {
+            const loginRes = await request(app).post("/api/auth/login").send({
+                email: "john.doe@example.com",
+                password: "Password123",
+            });
+            const token = loginRes.body.data.token;
+
+            const res = await request(app)
+                .post("/api/auth/change-password")
+                .set("Cookie", [`token=${token}`])
+                .send({
+                    oldPassword: "Password123",
+                    newPassword: "Password123",
+                });
+            expect(res.status).to.equal(200);
+            expect(res.body.message).to.equal("Password changed successfully");
+        });
+
+        it("should return error for wrong old password", async () => {
+            const loginRes = await request(app).post("/api/auth/login").send({
+                email: "john.doe@example.com",
+                password: "Password123",
+            });
+            const token = loginRes.body.data.token;
+
+            const res = await request(app)
+                .post("/api/auth/change-password")
+                .set("Cookie", [`token=${token}`])
+                .send({
+                    oldPassword: "wrongPassword",
+                    newPassword: "Password123",
+                });
+            expect(res.status).to.equal(401);
+            expect(res.body.message).to.equal("Wrong password");
+        });
+    });
 });
