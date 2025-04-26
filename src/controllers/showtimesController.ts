@@ -199,6 +199,46 @@ class ShowtimesController {
             next(error);
         }
     }
+
+    async getSeats(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { showtimeId } = req.params;
+            const showtime: any = await Showtime.findByPk(showtimeId);
+            if (showtime) {
+                const occupiedSeats: string[] = showtime.occupiedSeats;
+                const showtimePrice: number = showtime.price;
+                const hallId: number = showtime.hallId;
+                const hall: any = await Hall.findByPk(hallId);
+                const hallPriceMultiplier: number = hall.priceMultiplier;
+                const seats: any[] = hall.seats;
+                const availableSeats: any[] = [];
+                for (let seat of seats) {
+                    if (!occupiedSeats.includes(seat.seatId)) {
+                        availableSeats.push({
+                            seatId: seat.seatId,
+                            price: seat.priceMultiplier * showtimePrice * hallPriceMultiplier,
+                        });
+                    }
+                }
+                const successMessage: SuccessMessageI = {
+                    type: "success",
+                    message: "Seats fetched successfully",
+                    data: { showtimeId, availableSeats },
+                    code: 200,
+                };
+                return res.status(successMessage.code).send(successMessage);
+            } else {
+                const errorMessage: ErrorMessageI = {
+                    type: "error",
+                    message: "Showtime not found",
+                    code: 404,
+                };
+                return res.status(errorMessage.code).send(errorMessage);
+            }
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 export default ShowtimesController;

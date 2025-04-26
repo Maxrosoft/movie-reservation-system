@@ -12,5 +12,6 @@ showtimesRouter.get("/:showtimeId", authenticateToken as any, showtimesControlle
 showtimesRouter.put("/:showtimeId", authenticateAdminToken as any, showtimesController.changeOneCompletely as any);
 showtimesRouter.patch("/:showtimeId", authenticateAdminToken as any, showtimesController.changeOnePartly as any);
 showtimesRouter.delete("/:showtimeId", authenticateAdminToken as any, showtimesController.removeOne as any);
+showtimesRouter.get("/:showtimeId/seats", authenticateToken as any, showtimesController.getSeats as any);
 
 export default showtimesRouter;
