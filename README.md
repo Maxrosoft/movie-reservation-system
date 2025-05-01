@@ -69,4 +69,7 @@ cp .env.example .env
 
 # Start the server
 npm run dev
+
+# Alternatively, use Docker
+docker-compose up --build
 ```
