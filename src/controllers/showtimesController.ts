@@ -5,6 +5,20 @@ import SuccessMessageI from "../interfaces/successMessageI";
 import Movie from "../models/Movie";
 import Hall from "../models/Hall";
 
+async function overlap(startTime: Date, hallId: number): Promise<boolean> {
+    const showtimes: any[] = await Showtime.findAll({ where: { hallId } });
+
+    for (const showtime of showtimes) {
+        if (
+            new Date(showtime.startTime).getTime() <= new Date(startTime).getTime() &&
+            new Date(startTime).getTime() <= new Date(showtime.startTime + 3 * 60 * 60 * 1000).getTime()
+        ) {
+            return true;
+        }
+    }
+    return false;
+}
+
 class ShowtimesController {
     async addOne(req: Request, res: Response, next: NextFunction) {
         try {
@@ -13,6 +27,14 @@ class ShowtimesController {
                 const errorMessage: ErrorMessageI = {
                     type: "error",
                     message: "Missed required parameter",
+                    code: 400,
+                };
+                return res.status(errorMessage.code).send(errorMessage);
+            }
+            if (await overlap(startTime, hallId)) {
+                const errorMessage: ErrorMessageI = {
+                    type: "error",
+                    message: "Showtime overlap",
                     code: 400,
                 };
                 return res.status(errorMessage.code).send(errorMessage);
