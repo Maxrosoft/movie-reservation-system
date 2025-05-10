@@ -7,5 +7,6 @@ const reservationsController: ReservationsController = new ReservationsControlle
 
 reservationsRouter.post("/", authenticateToken as any, reservationsController.book as any);
 reservationsRouter.delete("/:reservationId", authenticateToken as any, reservationsController.cancel as any);
+reservationsRouter.get("/my", authenticateToken as any, reservationsController.getUsersReservations as any);
 
 export default reservationsRouter;

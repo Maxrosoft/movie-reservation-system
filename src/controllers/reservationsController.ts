@@ -40,6 +40,20 @@ async function seatsAlreadyReserved(seats: string[], showtimeId: number): Promis
     return showtime.occupiedSeats.some((seat: string) => seats.includes(seat));
 }
 
+async function calculateTotalPrice(seats: string[], showtimeId: number): Promise<number> {
+    const showtime: any = await Showtime.findByPk(showtimeId);
+    const hallId: any = showtime.hallId;
+    const hall: any = await Hall.findByPk(hallId);
+    const showtimePrice: number = showtime.price;
+    const hallPriceMultiplier: number = hall.priceMultiplier;
+    const hallSeats: any[] = hall.seats;
+    return seats.reduce(
+        (total, seat) =>
+            total + showtimePrice * hallPriceMultiplier * hallSeats.find((s) => s.seatId === seat).priceMultiplier,
+        0
+    );
+}
+
 class ReservationsController {
     async book(req: Request, res: Response, next: NextFunction) {
         try {
@@ -82,7 +96,7 @@ class ReservationsController {
                 return res.status(errorMessage.code).send(errorMessage);
             }
 
-            const reservation: any = await Reservation.create({ showtimeId, seats, userId });
+            const reservation: any = await Reservation.create({ showtimeId, seats, userId, totalPrice: await calculateTotalPrice(seats, showtimeId) });
             const successMessage: SuccessMessageI = {
                 type: "success",
                 message: "Reservation added successfully",
@@ -125,6 +139,25 @@ class ReservationsController {
             const successMessage: SuccessMessageI = {
                 type: "success",
                 message: "Reservation canceled successfully",
+                code: 200,
+            };
+            return res.status(successMessage.code).send(successMessage);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getUsersReservations(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { userId } = req as any;
+            const page: number = Number(req.query.page) || 1;
+            const limit: number = Number(req.query.limit) || 10;
+            const offset: number = (page - 1) * limit;
+            const reservations: any[] = await Reservation.findAll({ where: { userId }, limit, offset });
+            const successMessage: SuccessMessageI = {
+                type: "success",
+                message: "Reservations found successfully",
+                data: { page, limit, reservations },
                 code: 200,
             };
             return res.status(successMessage.code).send(successMessage);

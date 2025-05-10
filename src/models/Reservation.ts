@@ -34,6 +34,14 @@ const Reservation = sequelize.define("Reservation", {
                 }
             },
         },
+    },
+    totalPrice: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        defaultValue: 0.0,
+        validate: {
+            min: 0.0,
+        },
     }
 });
 

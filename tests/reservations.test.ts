@@ -77,7 +77,7 @@ describe("Reservation tests", () => {
             expect(res.body.message).to.equal("Reservation added successfully");
             testReservationId = res.body.data.reservationId;
         });
-        
+
         it("should return error for not found showtime", async () => {
             const loginRes = await request(app).post("/api/auth/login").send({
                 email: SUPER_ADMIN_EMAIL,
@@ -170,6 +170,25 @@ describe("Reservation tests", () => {
             expect(res.status).to.equal(404);
             expect(res.body.type).to.equal("error");
             expect(res.body.message).to.equal("Reservation not found");
+        });
+    });
+
+    describe("GET /api/reservations/my", () => {
+        it("should return all of a user's reservations", async () => {
+            const loginRes = await request(app).post("/api/auth/login").send({
+                email: SUPER_ADMIN_EMAIL,
+                password: SUPER_ADMIN_PASSWORD,
+            });
+            const token = loginRes.body.data.token;
+
+            const res = await request(app)
+                .get("/api/reservations/my")
+                .set("Cookie", [`token=${token}`]);
+
+            expect(res.status).to.equal(200);
+            expect(res.body.type).to.equal("success");
+            expect(res.body.message).to.equal("Reservations found successfully");
+            expect(res.body.data).to.have.property("reservations");
         });
     });
 });
