@@ -30,6 +30,7 @@ describe("Reservation tests", () => {
     };
     let testHallId: number;
     let testShowtimeId: number;
+    let testReservationId: number;
     before(async () => {
         await createSuperAdmin();
         await Movie.destroy({ where: { title: "Test Movie" } });
@@ -74,6 +75,7 @@ describe("Reservation tests", () => {
             expect(res.status).to.equal(201);
             expect(res.body.type).to.equal("success");
             expect(res.body.message).to.equal("Reservation added successfully");
+            testReservationId = res.body.data.reservationId;
         });
         
         it("should return error for not found showtime", async () => {
@@ -134,6 +136,40 @@ describe("Reservation tests", () => {
             expect(res.status).to.equal(400);
             expect(res.body.type).to.equal("error");
             expect(res.body.message).to.equal("Seats already reserved");
+        });
+    });
+
+    describe("DELETE /api/reservations/:reservationId", () => {
+        it("should cancel a reservation", async () => {
+            const loginRes = await request(app).post("/api/auth/login").send({
+                email: SUPER_ADMIN_EMAIL,
+                password: SUPER_ADMIN_PASSWORD,
+            });
+            const token = loginRes.body.data.token;
+
+            const res = await request(app)
+                .delete(`/api/reservations/${testReservationId}`)
+                .set("Cookie", [`token=${token}`]);
+
+            expect(res.status).to.equal(200);
+            expect(res.body.type).to.equal("success");
+            expect(res.body.message).to.equal("Reservation canceled successfully");
+        });
+
+        it("should return error for not found reservation", async () => {
+            const loginRes = await request(app).post("/api/auth/login").send({
+                email: SUPER_ADMIN_EMAIL,
+                password: SUPER_ADMIN_PASSWORD,
+            });
+            const token = loginRes.body.data.token;
+
+            const res = await request(app)
+                .delete("/api/reservations/0")
+                .set("Cookie", [`token=${token}`]);
+
+            expect(res.status).to.equal(404);
+            expect(res.body.type).to.equal("error");
+            expect(res.body.message).to.equal("Reservation not found");
         });
     });
 });
