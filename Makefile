@@ -1,10 +1,10 @@
 SERVICE=backend
 
 prod:
-	docker compose run --rm $(SERVICE) npm start
+	docker compose run --rm --service-ports $(SERVICE) npm start
 
 dev:
-	docker compose run --rm $(SERVICE) npm run dev
+	docker compose run --rm --service-ports $(SERVICE) npm run dev
 
 test:
 	docker compose run --rm $(SERVICE) npm test
