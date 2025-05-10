@@ -54,6 +54,7 @@ class ShowtimesController {
                     hall: publicHall,
                     startTime: showtime.startTime,
                     price: showtime.price,
+                    occupiedSeats: showtime.occupiedSeats,
                 });
             }
             const successMessage: SuccessMessageI = {
@@ -89,6 +90,7 @@ class ShowtimesController {
                     hall: publicHall,
                     startTime: showtime.startTime,
                     price: showtime.price,
+                    occupiedSeats: showtime.occupiedSeats,
                 };
                 const successMessage: SuccessMessageI = {
                     type: "success",
