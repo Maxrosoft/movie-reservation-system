@@ -6,5 +6,6 @@ const reservationsRouter: Router = Router();
 const reservationsController: ReservationsController = new ReservationsController();
 
 reservationsRouter.post("/", authenticateToken as any, reservationsController.book as any);
+reservationsRouter.delete("/:reservationId", authenticateToken as any, reservationsController.cancel as any);
 
 export default reservationsRouter;

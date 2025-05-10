@@ -24,8 +24,18 @@ async function markSeatsAsOccupied(seats: string[], showtimeId: number): Promise
     await showtime.save();
 }
 
+async function removeSeatsFromOccupied(seats: string[], showtimeId: number): Promise<void> {
+    const showtime: any = await Showtime.findByPk(showtimeId);
+    showtime.occupiedSeats = showtime.occupiedSeats.filter((seat: string) => !seats.includes(seat));
+    await showtime.save();
+}
 
-async function checkIfReserved(seats: string[], showtimeId: number): Promise<boolean> {
+async function showtimeAlreadyStarted(showtimeId: number): Promise<boolean> {
+    const showtime: any = await Showtime.findByPk(showtimeId);
+    return showtime.startTime <= Date.now() - 3 * 60 * 60 * 1000;
+}
+
+async function seatsAlreadyReserved(seats: string[], showtimeId: number): Promise<boolean> {
     const showtime: any = await Showtime.findByPk(showtimeId);
     return showtime.occupiedSeats.some((seat: string) => seats.includes(seat));
 }
@@ -63,7 +73,7 @@ class ReservationsController {
                 return res.status(errorMessage.code).send(errorMessage);
             }
 
-            if (await checkIfReserved(seats, showtimeId)) {
+            if (await seatsAlreadyReserved(seats, showtimeId)) {
                 const errorMessage: ErrorMessageI = {
                     type: "error",
                     message: "Seats already reserved",
@@ -80,6 +90,43 @@ class ReservationsController {
                 code: 201,
             };
             await markSeatsAsOccupied(seats, showtimeId);
+            return res.status(successMessage.code).send(successMessage);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async cancel(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { reservationId } = req.params;
+            const { userId } = req as any;
+            const reservation: any = await Reservation.findOne({ where: { id: reservationId, userId } });
+            if (!reservation) {
+                const errorMessage: ErrorMessageI = {
+                    type: "error",
+                    message: "Reservation not found",
+                    code: 404,
+                };
+                return res.status(errorMessage.code).send(errorMessage);
+            }
+            const showtimeId: any = reservation.showtimeId;
+            const seats: string[] = reservation.seats;
+
+            if (await showtimeAlreadyStarted(showtimeId)) {
+                const errorMessage: ErrorMessageI = {
+                    type: "error",
+                    message: "Showtime already started",
+                    code: 400,
+                };
+                return res.status(errorMessage.code).send(errorMessage);
+            }
+            await removeSeatsFromOccupied(seats, showtimeId);
+            await reservation.destroy();
+            const successMessage: SuccessMessageI = {
+                type: "success",
+                message: "Reservation canceled successfully",
+                code: 200,
+            };
             return res.status(successMessage.code).send(successMessage);
         } catch (error) {
             next(error);
