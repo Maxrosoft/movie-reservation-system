@@ -11,6 +11,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
+      pgadmin:
+        condition: service_started
     environment:
       PORT: ${PORT}
       POSTGRES_URI: ${POSTGRES_URI}
@@ -27,6 +29,9 @@ services:
       - "3000:3000"
     networks:
       - backend
+    volumes:
+      - .:/app
+      - /app/node_modules
 
   postgres:
     image: postgres:latest
