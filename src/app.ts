@@ -7,6 +7,7 @@ import moviesRouter from "./routes/moviesRouter";
 import showtimesRouter from "./routes/showtimesRouter";
 import hallsRouter from "./routes/hallsRouter";
 import reservationsRouter from "./routes/reservationsRouter";
+import adminRouter from "./routes/adminRouter";
 import errorHandler from "./middlewares/errorHandler";
 import sequelize from "./config/sequelize";
 import redisClient from "./config/redis";
@@ -25,6 +26,7 @@ app.use("/api/movies/", moviesRouter);
 app.use("/api/showtimes/", showtimesRouter);
 app.use("/api/halls/", hallsRouter);
 app.use("/api/reservations/", reservationsRouter);
+app.use("/api/admin/", adminRouter);
 app.use(errorHandler as any);
 
 function gracefulShutdown(signal: string): void {
