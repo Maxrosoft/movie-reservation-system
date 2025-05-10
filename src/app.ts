@@ -8,6 +8,7 @@ import showtimesRouter from "./routes/showtimesRouter";
 import hallsRouter from "./routes/hallsRouter";
 import errorHandler from "./middlewares/errorHandler";
 import sequelize from "./config/sequelize";
+import redisClient from "./config/redis";
 import createSuperAdmin from "./utils/createSuperAdmin";
 import "./utils/automaticShowtimesDeletion";
 
@@ -23,6 +24,16 @@ app.use("/api/movies/", moviesRouter);
 app.use("/api/showtimes/", showtimesRouter);
 app.use("/api/halls/", hallsRouter);
 app.use(errorHandler as any);
+
+function gracefulShutdown(signal: string): void {
+    console.log(`Received ${signal}`);
+    sequelize.close();
+    redisClient.disconnect();
+    process.exit();
+}
+
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
 
 (async () => {
     try {

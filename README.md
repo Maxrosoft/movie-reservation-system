@@ -60,16 +60,32 @@ Authentication is handled via JWT. Endpoints are protected using:
 git clone https://github.com/Maxrosoft/movie-reservation-system.git
 cd movie-reservation-system
 
-# Install dependencies
-npm install
-
 # Set up environment
 cp .env.example .env
 # Fill in DB connection, JWT secret, etc.
 
 # Start the server
-npm run dev
+make dev
 
-# Alternatively, use Docker
-docker-compose up --build
+# Run tests
+make test
+
+# Build for production
+make prod
+
+# Build Docker images
+make build
+
+# Start the stack
+make up
+
+# Stop the stack
+make down
+
+# Clean up images and volumes
+make clean
+
+# View logs
+make logs
 ```
+
