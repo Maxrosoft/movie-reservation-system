@@ -53,6 +53,18 @@ Authentication is handled via JWT. Endpoints are protected using:
 - `PUT /:userId/promote` – Promote user to admin _(admin)_
 - `PUT /:userId/demote` – Demote user from admin _(super admin)_
 
+### Reservations (`/api/reservations`)
+
+ - `POST /` – Add new reservation _(user)_
+ - `DELETE /:reservationId` – Cancel reservation by ID _(user)_
+ - `GET /my` – Get all reservations for current user _(user)_
+
+### Admin (`/api/admin`)
+
+- `GET /reservations` – Get all reservations _(admin)_
+- `GET /reports` – Get reports _(admin)_
+
+
 ## 🛠 Setup Instructions
 
 ```bash

@@ -6,6 +6,8 @@ import usersRouter from "./routes/usersRouter";
 import moviesRouter from "./routes/moviesRouter";
 import showtimesRouter from "./routes/showtimesRouter";
 import hallsRouter from "./routes/hallsRouter";
+import reservationsRouter from "./routes/reservationsRouter";
+import adminRouter from "./routes/adminRouter";
 import errorHandler from "./middlewares/errorHandler";
 import sequelize from "./config/sequelize";
 import redisClient from "./config/redis";
@@ -23,6 +25,8 @@ app.use("/api/users/", usersRouter);
 app.use("/api/movies/", moviesRouter);
 app.use("/api/showtimes/", showtimesRouter);
 app.use("/api/halls/", hallsRouter);
+app.use("/api/reservations/", reservationsRouter);
+app.use("/api/admin/", adminRouter);
 app.use(errorHandler as any);
 
 function gracefulShutdown(signal: string): void {
@@ -42,7 +46,7 @@ process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
         console.log("Database connected successfully :)");
         app.listen(PORT, () => {
             console.log(`App is listening on port ${PORT}`);
-        });
+        });                
     } catch (error) {
         console.log("Database connection failed :(");
     }
